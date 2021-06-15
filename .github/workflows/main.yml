@@ -1,0 +1,26 @@
+  
+name: CI
+
+on: [push]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - uses: azure/docker-login@v1
+      with:
+        login-server: olavstoppendockerregistry.azurecr.io
+        username: ${{ secrets.REGISTRY_USERNAME }}
+        password: ${{ secrets.REGISTRY_PASSWORD }}
+
+    - run: |
+        docker build . -t olavstoppendockerregistry.azurecr.io/ot-weather:${{ github.sha }}
+        docker push olavstoppendockerregistry.azurecr.io/ot-weather:${{ github.sha }}     
+    - uses: azure/webapps-deploy@v2
+      with:
+        app-name: 'ot-pingu-server'
+        publish-profile: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE }}
+        images: 'olavstoppendockerregistry.azurecr.io/ot-weather:${{ github.sha }}'
