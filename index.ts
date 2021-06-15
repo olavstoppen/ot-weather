@@ -7,7 +7,7 @@ import { CountyForecast, CountyForecastInnerLocation, CountyForecastLocation, We
 
 
 const app = express();
-const PORT = 8000;
+const PORT = process.env.PORT;
 const APP_SERVER_URL = process.env.APP_SERVER_URL;
 
 app.get('/weather', (req, res) => {
