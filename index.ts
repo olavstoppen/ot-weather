@@ -1,11 +1,11 @@
-require('dotenv').config();
+import dotenv from "dotenv";
 import express, { response } from 'express';
 import fetch from 'node-fetch'
 import * as xml2js from 'xml2js';
 import { CountyForecast, CountyForecastInnerLocation, CountyForecastLocation, WeatherData, WeatherDataTime, WeatherResponse, WeatherResponseForecast } from './models/weather.interfaces';
 
 
-
+dotenv.config();
 const app = express();
 const PORT = process.env.PORT;
 const APP_SERVER_URL = process.env.APP_SERVER_URL;
@@ -30,7 +30,7 @@ app.get('/weather', (req, res) => {
 
 });
 
-//Apparently met.no doesn't have this API in JSON :(
+//Apparently met.no doesn't have this API in JSON
 async function getForecastString(): Promise<string> {
     const response = await fetch(
         'https://api.met.no/weatherapi/textforecast/2.0/?forecast=landoverview')
