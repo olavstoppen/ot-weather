@@ -6,6 +6,7 @@ RUN npm install
 COPY . .
 
 ENV PORT=80
+ENV APP_SERVER_URL="https://ot-weather.azurewebsites.net"
 EXPOSE 80
 
 RUN [ "npm", "run", "build" ]
