@@ -102,8 +102,8 @@ function generateWeatherObj(weatherDataTime: WeatherDataTime[], weatherDescripti
  * @returns a string url for the symbolcode
  */
 function getSymbolUrlFromId(symbolCode: string) {
-    const url = APP_SERVER_URL + "/weather-symbols/" + symbolCode + ".svg";
-    return url;
+    
+    return symbolCode == "" ? "" : APP_SERVER_URL + "/weather-symbols/" + symbolCode + ".svg";
 }
 
 /**
@@ -138,7 +138,7 @@ function getFutureForecastWeatherResponse(weather: WeatherDataTime[]) {
             highestTemp : i.data.instant.details.air_temperature_percentile_90,
             lowestTemp : i.data.instant.details.air_temperature_percentile_10,
             name : getWeekDay(new Date(i.time).getDay()),
-            symbolUrl : getSymbolUrlFromId(i.data.next_6_hours.summary.symbol_code)
+            symbolUrl : getSymbolUrlFromId(i.data.next_6_hours.summary ? i.data.next_6_hours.summary.symbol_code : "")
         
         }
 
