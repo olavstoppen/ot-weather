@@ -131,16 +131,19 @@ function getAllTimesForToday(weather: WeatherDataTime[]) {
 function getFutureForecastWeatherResponse(weather: WeatherDataTime[]) {
 
     let futureWeatherResponseList : WeatherResponseForecast[] = [];
-
+    
     weather.map(i => {
-        let w : WeatherResponseForecast = {
+        const nextHours = i.data.next_6_hours ? i.data.next_6_hours : i.data.next_1_hours;
+        const w : WeatherResponseForecast = {
             temp : i.data.instant.details.air_temperature,
             highestTemp : i.data.instant.details.air_temperature_percentile_90,
             lowestTemp : i.data.instant.details.air_temperature_percentile_10,
             name : getWeekDay(new Date(i.time).getDay()),
-            symbolUrl : getSymbolUrlFromId(i.data.next_6_hours.summary ? i.data.next_6_hours.summary.symbol_code : "")
+            symbolUrl : getSymbolUrlFromId(nextHours.summary.symbol_code)
         
         }
+
+        console.log(i.data.next_6_hours ? true : false, w.name);
 
 
         futureWeatherResponseList.push(w)
