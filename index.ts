@@ -143,7 +143,6 @@ function getFutureForecastWeatherResponse(weather: WeatherDataTime[]) {
         
         }
 
-        console.log(i.data.next_6_hours ? true : false, w.name);
 
 
         futureWeatherResponseList.push(w)
@@ -161,18 +160,13 @@ function getFutureForecastWeatherData(weather: WeatherDataTime[]) {
     const todaysDate = new Date();
     let futureWeatherList :  WeatherDataTime[] = [];
     const hour = 12;
-    //console.log(weather);
+
     
 //We only want one forecast for each future day, so we have to filter out everything that is not the current day, and we want the forecast for exactly 14:00 each day
     const futureWeatherData = weather.filter(i => {
 
         //Seeing in the api, 14:00 seem to be only one present in all of the forecast when going over 3 days, might change later
         if (!isSameDay(todaysDate, new Date(i.time)) && new Date(i.time).getUTCHours() === hour) {
-            //console.log("hour: " + new Date(i.time).getHours() + " date: "+ new Date(i.time).getDate());
-            console.log(new Date(i.time).getUTCHours());
-            console.log(new Date(i.time));
-            console.log(i.time);
-            console.log("______________");
             
             futureWeatherList.push(i)
             return true;
@@ -252,7 +246,7 @@ async function api<T>(url: string): Promise<T> {
         throw new Error(response.statusText);
     }*/
     return await (response.json() as Promise<T>);
-    //    console.log(data);
+
 
 }
 
