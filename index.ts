@@ -63,11 +63,12 @@ async function getForecastString(): Promise<string> {
  * @returns an object that corresponds with the WeatherResponse interface
  */
 function generateWeatherObj(weatherDataTime: WeatherDataTime[], weatherDescription : string) {
-    const currentWeather = getCurrentHourWeather(weatherDataTime)[0];
+    const todaysWeather = getAllTimesForToday(weatherDataTime);
 
-    const currentDay = getWeekDay(new Date(currentWeather.time).getDay());
-    const lowestTemp = currentWeather.data.instant.details.air_temperature_percentile_10;
-    const highestTemp = currentWeather.data.instant.details.air_temperature_percentile_90;
+    const currentWeather = getCurrentHourWeather(todaysWeather)[0];
+    const currentDayName = getWeekDay(new Date(currentWeather.time).getDay());
+    const lowestTemp = getLowestTempOfCurrentDay(todaysWeather);
+    const highestTemp = getHighestTempOfCurrentDay(todaysWeather);
     const currentTemp = currentWeather.data.instant.details.air_temperature;
 
     const currentRainfall = currentWeather.data.next_1_hours.details.precipitation_amount;
@@ -81,7 +82,7 @@ function generateWeatherObj(weatherDataTime: WeatherDataTime[], weatherDescripti
     const weather: WeatherResponse = {
         today:
         {
-            name: currentDay,
+            name: currentDayName,
             currentRainfall: currentRainfall,
             minRainfall: lowestRainfall,
             maxRainfall: highestRainfall,
@@ -113,14 +114,13 @@ function getSymbolUrlFromId(symbolCode: string) {
  */
 function getAllTimesForToday(weather: WeatherDataTime[]) {
     const todaysDate = new Date();
-    const filteredByToday = weather.filter(i => {
+
+    return weather.filter(i => {
         if (isSameDay(todaysDate, new Date(i.time))) {
             return true;
         }
         return false;
     });
-
-    return filteredByToday;
 }
 
 /*
@@ -142,9 +142,6 @@ function getFutureForecastWeatherResponse(weather: WeatherDataTime[]) {
             symbolUrl : getSymbolUrlFromId(nextHours.summary.symbol_code)
         
         }
-
-
-
         futureWeatherResponseList.push(w)
     })
 
@@ -153,7 +150,7 @@ function getFutureForecastWeatherResponse(weather: WeatherDataTime[]) {
 /**
  * 
  * @param weather 
- * @returns The forecast data from the API, but filtered out with only one occurence for each day at 14:00 except for current day
+ * @returns The forecast data from the API, but filtered out with only one occurence for each day at UTC (servertime) 12:00 except for current day
  */
 function getFutureForecastWeatherData(weather: WeatherDataTime[]) {
 
@@ -162,10 +159,9 @@ function getFutureForecastWeatherData(weather: WeatherDataTime[]) {
     const hour = 12;
 
     
-//We only want one forecast for each future day, so we have to filter out everything that is not the current day, and we want the forecast for exactly 14:00 each day
-    const futureWeatherData = weather.filter(i => {
-
-        //Seeing in the api, 14:00 seem to be only one present in all of the forecast when going over 3 days, might change later
+//We only want one forecast for each future day, so we have to filter out everything that is not the current day, and we want the forecast for exactly UTC 12:00 each day
+        weather.filter(i => {
+        //TODO: Seeing in the api, UTC 12:00 seem to be only one present in all of the forecast when going over 3 days, might change later
         if (!isSameDay(todaysDate, new Date(i.time)) && new Date(i.time).getUTCHours() === hour) {
             
             futureWeatherList.push(i)
@@ -183,16 +179,33 @@ function getFutureForecastWeatherData(weather: WeatherDataTime[]) {
  */
 function getCurrentHourWeather(weather: WeatherDataTime[]) {
     const todaysDate = new Date();
-    const filteredByToday: WeatherDataTime[] = getAllTimesForToday(weather);
 
-    const currentWeather = filteredByToday.filter(i => {
+    return weather.filter(i => {
         if (isWithinTheHour(todaysDate, new Date(i.time))) {
             return true;
         }
         return false
-    })
+    });
+}
+/**
+ * 
+ * @param weather all weather data from api
+ * @returns 
+ */
+function getHighestTempOfCurrentDay(weather: WeatherDataTime[]) {
 
-    return currentWeather;
+    const highest = Math.max.apply(Math, weather.map((w) => {
+        return parseFloat(w.data.instant.details.air_temperature);
+    }));
+    return highest;
+}
+
+function getLowestTempOfCurrentDay(weather: WeatherDataTime[]) {
+
+    const lowest = Math.min.apply(Math, weather.map((w) => {
+        return parseFloat(w.data.instant.details.air_temperature);
+    }));
+    return lowest;
 }
 /**
  * 

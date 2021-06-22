@@ -94,8 +94,8 @@ export interface WeatherResponse {
         minRainfall: string;
         maxRainfall: string;
         temp: string;
-        lowestTemp: string;
-        highestTemp: string;
+        lowestTemp: number;
+        highestTemp: number;
         description: string;
         symbolUrl: string;
     };
