@@ -30,14 +30,17 @@ app.get('/weather', (req, res) => {
 
 });
 
+//TODO: Rewrite to use api() function further down
 //Apparently met.no doesn't have this API in JSON
 async function getForecastString(): Promise<string> {
     const response = await fetch(
-        'https://api.met.no/weatherapi/textforecast/2.0/?forecast=landoverview')
+        'https://api.met.no/weatherapi/textforecast/2.0/?forecast=landoverview', { headers: { 'User-Agent': 'Olavstoppen-Dash edvard.bjorgen@olavstoppen.no' } })
     const data = await response.text();
+console.log(data);
 
     return new Promise<string>(resolve => {
         xml2js.parseString(data, (err, res: CountyForecast) => {
+        console.log(res);
         
             const rogaland = res.textforecast.time[0].forecasttype[0].location.find(
                 (i) => {
@@ -251,6 +254,7 @@ function getWeekDay(day: number) {
  * @param url 
  * @returns Takes in a url and a generic type and returns it as json. met.no prefers to receive User-Agent in header, or else they give yoy 429 and 403 all the damn time
  * TODO: send header separately
+ * TODO: Make more general so it can be used for retrieving other things, not only json 
  */
 async function api<T>(url: string): Promise<T> {
     const response = await fetch(url, { headers: { 'User-Agent': 'Olavstoppen-Dash edvard.bjorgen@olavstoppen.no' } }
