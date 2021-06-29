@@ -72,7 +72,7 @@ function generateWeatherObj(weatherDataTime: WeatherDataTime[], weatherDescripti
     const currentDayName = getWeekDay(new Date(currentWeather.time).getDay());
     const lowestTemp = getLowestTempOfCurrentDay(todaysWeather);
     const highestTemp = getHighestTempOfCurrentDay(todaysWeather);
-    const currentTemp = currentWeather.data.instant.details.air_temperature;
+    const currentTemp = parseFloat(currentWeather.data.instant.details.air_temperature);
 
     const currentRainfall = currentWeather.data.next_1_hours.details.precipitation_amount;
     const highestRainfall = currentWeather.data.next_1_hours.details.precipitation_amount_max;
@@ -89,9 +89,9 @@ function generateWeatherObj(weatherDataTime: WeatherDataTime[], weatherDescripti
             currentRainfall: currentRainfall,
             minRainfall: lowestRainfall,
             maxRainfall: highestRainfall,
-            temp: currentTemp,
-            lowestTemp: lowestTemp,
-            highestTemp: highestTemp,
+            temp: Math.round(currentTemp),
+            lowestTemp: Math.round(lowestTemp),
+            highestTemp: Math.round(highestTemp),
             description: descriptionString,
             symbolUrl: symbolUrl,
         },
@@ -137,13 +137,16 @@ function getFutureForecastWeatherResponse(weather: WeatherDataTime[]) {
     
     weather.map(i => {
         const nextHours = i.data.next_6_hours ? i.data.next_6_hours : i.data.next_1_hours;
+            const forecastTemp = parseFloat(i.data.instant.details.air_temperature);
+            const forecastHighestTemp = parseFloat(i.data.instant.details.air_temperature_percentile_90);
+            const forecastLowestTemp = parseFloat(i.data.instant.details.air_temperature_percentile_10);
+            
         const w : WeatherResponseForecast = {
-            temp : i.data.instant.details.air_temperature,
-            highestTemp : i.data.instant.details.air_temperature_percentile_90,
-            lowestTemp : i.data.instant.details.air_temperature_percentile_10,
+            temp : Math.round(forecastTemp),
+            highestTemp : Math.round(forecastHighestTemp),
+            lowestTemp : Math.round(forecastLowestTemp),
             name : getWeekDay(new Date(i.time).getDay()),
             symbolUrl : getSymbolUrlFromId(nextHours.summary.symbol_code)
-        
         }
         futureWeatherResponseList.push(w)
     })
