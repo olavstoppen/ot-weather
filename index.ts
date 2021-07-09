@@ -150,8 +150,8 @@ function getFutureForecastWeatherResponse(weather: WeatherDataTime[]) {
         }
         futureWeatherResponseList.push(w)
     })
-
-    return futureWeatherResponseList;
+//Slices the list to only return first five
+    return futureWeatherResponseList.slice(0,5);
 }
 /**
  * 
